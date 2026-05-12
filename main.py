@@ -1,28 +1,31 @@
 import os
-import json
+import logging
+from dotenv import load_dotenv
 from fbchat import Client
 from fbchat.models import Message
+from config import Config
+from bot import MonsterBot
 
-# جلب بيانات الجلسة من متغيرات البيئة في Railway
-appstate_raw = os.environ.get('APPSTATE_JSON')
+# تحميل متغيرات البيئة
+load_dotenv()
 
-class MessengerBot(Client):
-    def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
-        # تجاهل الرسائل المرسلة من البوت نفسه
-        if author_id != self.uid:
-            self.send(Message(text="تم استلام رسالتك! البوت يعمل الآن بنجاح 🚀"), thread_id=thread_id, thread_type=thread_type)
+# إعداد السجلات
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-if appstate_raw:
+def main():
+    """تشغيل بوت مونستر"""
     try:
-        # تحويل النص إلى قاموس (JSON)
-        session_cookies = json.loads(appstate_raw)
-        
-        # تسجيل الدخول باستخدام الكوكيز فقط
-        client = MessengerBot(' ', ' ', session_cookies=session_cookies)
-        
-        print("تم تسجيل الدخول بنجاح! البوت في حالة استماع...")
-        client.listen()
+        config = Config()
+        bot = MonsterBot(config)
+        logger.info("🤖 بوت مونستر يعمل الآن...")
+        bot.run()
     except Exception as e:
-        print(f"حدث خطأ أثناء تسجيل الدخول: {e}")
-else:
-    print("خطأ: لم يتم العثور على APPSTATE_JSON في إعدادات Railway")
+        logger.error(f"❌ خطأ في تشغيل البوت: {e}")
+        raise
+
+if __name__ == "__main__":
+    main()

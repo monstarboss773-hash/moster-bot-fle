@@ -7,6 +7,8 @@ class Config:
     """إعدادات البوت"""
     
     # بيانات المصادقة
+    EMAIL = os.getenv('EMAIL', '')
+    PASSWORD = os.getenv('PASSWORD', '')
     APPSTAT = os.getenv('APPSTAT', '')
     COOKIES = os.getenv('COOKIES', '')
     
@@ -21,7 +23,7 @@ class Config:
     @classmethod
     def validate(cls):
         """التحقق من وجود جميع المتغيرات المطلوبة"""
-        required = ['APPSTAT', 'COOKIES']
+        required = ['EMAIL', 'PASSWORD', 'APPSTAT', 'COOKIES']
         missing = [var for var in required if not getattr(cls, var)]
         
         if missing:

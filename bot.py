@@ -18,19 +18,30 @@ class MonsterBot(Client):
         self.config = config
         self.config.validate()
         
-        # تحويل الكوكيز من JSON إذا لزم الأمر
+        # تحويل الكوكيز من JSON
         try:
             cookies = json.loads(self.config.COOKIES)
-        except:
-            cookies = self.config.COOKIES
+        except (json.JSONDecodeError, TypeError) as e:
+            raise ValueError(f"❌ فشل تحليل COOKIES كـ JSON: {e}")
         
-        # تهيئة عميل Facebook
+        # التحقق من وجود c_user في الكوكيز
+        user_id = cookies.get("c_user")
+        if not user_id:
+            raise ValueError("❌ لم يتم العثور على c_user في الكوكيز. تأكد من صحة COOKIES")
+        
+        # تهيئة عميل Facebook مع email و password كمعاملات مطلوبة
         super().__init__(
+            email="",
+            password="",
             session_cookies=cookies,
-            user_agent="Mozilla/5.0"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         )
         
-        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح")
+        # تعيين uid إذا لم يقم fbchat بتعيينه تلقائياً
+        if not getattr(self, "uid", None):
+            self.uid = str(user_id)
+        
+        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح (uid: {self.uid})")
     
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         """

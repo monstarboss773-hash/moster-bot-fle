@@ -24,11 +24,19 @@ class MonsterBot(Client):
         except:
             cookies = self.config.COOKIES
         
+        # استخراج معرف المستخدم من الكوكيز إن وجد
+        c_user = cookies.get('c_user') if isinstance(cookies, dict) else None
+        
         # تهيئة عميل Facebook
         super().__init__(
+            email=self.config.EMAIL,
+            password=self.config.PASSWORD,
             session_cookies=cookies,
-            user_agent="Mozilla/5.0"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         )
+        
+        if c_user and not self.uid:
+            self.uid = str(c_user)
         
         logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح")
     

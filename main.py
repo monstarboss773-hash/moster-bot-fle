@@ -1,8 +1,5 @@
-import os
 import logging
 from dotenv import load_dotenv
-from fbchat import Client
-from fbchat.models import Message
 from config import Config
 from bot import MonsterBot
 

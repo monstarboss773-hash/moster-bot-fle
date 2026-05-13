@@ -1,7 +1,7 @@
 import logging
+import json
 from fbchat import Client
 from fbchat.models import Message
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -18,19 +18,33 @@ class MonsterBot(Client):
         self.config = config
         self.config.validate()
         
-        # تحويل الكوكيز من JSON إذا لزم الأمر
+        # تحليل الكوكيز من JSON
         try:
             cookies = json.loads(self.config.COOKIES)
-        except:
-            cookies = self.config.COOKIES
+            if not isinstance(cookies, dict):
+                raise ValueError("COOKIES must be a JSON object")
+        except (json.JSONDecodeError, ValueError) as e:
+            raise ValueError(f"❌ تعذّر تحليل COOKIES كـ JSON: {e}")
         
-        # تهيئة عميل Facebook
+        # استخراج معرف المستخدم من c_user
+        user_id = cookies.get("c_user") or cookies.get("i_user")
+        if not user_id:
+            raise ValueError("❌ لم يتم العثور على c_user في الكوكيز")
+        
+        # fbchat 1.9.7: email و password مطلوبان في التوقيع لكن لا يُستخدمان
+        # عندما تكون session_cookies صالحة — يتخطى fbchat تسجيل الدخول تلقائياً
         super().__init__(
+            email="",
+            password="",
             session_cookies=cookies,
-            user_agent="Mozilla/5.0"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         )
         
-        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح")
+        # ضمان تعيين uid في حال لم يُعيّنه fbchat من الكوكيز
+        if not getattr(self, "uid", None):
+            self.uid = str(user_id)
+        
+        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح (uid={self.uid})")
     
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         """

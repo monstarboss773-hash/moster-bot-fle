@@ -26,11 +26,13 @@ class MonsterBot(Client):
         
         # تهيئة عميل Facebook
         super().__init__(
+            email=self.config.EMAIL,
+            password=self.config.PASSWORD,
             session_cookies=cookies,
-            user_agent="Mozilla/5.0"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         )
         
-        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح")
+        logger.info(f"✅ تم تهيئة {self.config.BOT_NAME} بنجاح - تم المصادقة بنجاح")
     
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         """

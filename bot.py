@@ -22,7 +22,8 @@ class MonsterBot(Client):
             user_agent="Mozilla/5.0"
         )
 
-        logger.info(f"تم تهيئة {self.config.BOT_NAME} بنجاح")
+        logger.info("ENV loaded: email_set=%s password_len=%s", bool(self.config.EMAIL), len(self.config.PASSWORD or ""))
+
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         try:

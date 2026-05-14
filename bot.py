@@ -11,15 +11,17 @@ class MonsterBot(Client):
         self.config.validate()
 
         try:
-            cookies = json.loads(self.config.COOKIES)
-        except json.JSONDecodeError:
-            cookies = self.config.COOKIES
-
-        super().__init__(
-            self.config.EMAIL,
-            self.config.PASSWORD,
-            session_cookies=cookies,
-            user_agent="Mozilla/5.0"
+    super().__init__(
+        session_cookies=cookies,
+        user_agent="Mozilla/5.0"
+    )
+except TypeError:
+    super().__init__(
+        self.config.EMAIL,
+        self.config.PASSWORD,
+        session_cookies=cookies,
+        user_agent="Mozilla/5.0"
+    
         )
 
         logger.info("ENV loaded: email_set=%s password_len=%s", bool(self.config.EMAIL), len(self.config.PASSWORD or ""))

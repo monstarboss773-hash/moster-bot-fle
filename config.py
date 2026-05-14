@@ -8,24 +8,23 @@ except ModuleNotFoundError:
 
 load_dotenv()
 
+
 class Config:
-    APPSTAT = os.getenv('APPSTAT', '').strip()
-    COOKIES = os.getenv('COOKIES', '').strip()
+    def __init__(self):
+        self.APPSTAT = os.getenv("APPSTAT", "").strip()
+        self.COOKIES = os.getenv("COOKIES", "").strip()
 
-    EMAIL = os.getenv('EMAIL', '').strip()
-    PASSWORD = os.getenv('PASSWORD', '').strip()
+        self.EMAIL = os.getenv("EMAIL", "").strip()
+        self.PASSWORD = os.getenv("PASSWORD", "").strip()
 
-    BOT_NAME = "Monster Bot"
-    BOT_VERSION = "1.0.0"
+        self.BOT_NAME = "Monster Bot"
+        self.BOT_VERSION = "1.0.0"
 
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').strip()
+        self.LOG_LEVEL = (os.getenv("LOG_LEVEL", "INFO") or "INFO").strip()
 
-    @classmethod
-    def validate(cls):
-        required = ['APPSTAT', 'COOKIES', 'EMAIL', 'PASSWORD']
-        missing = [var for var in required if not getattr(cls, var, '')]
-
+    def validate(self):
+        required = ["EMAIL", "PASSWORD", "COOKIES"]
+        missing = [var for var in required if not getattr(self, var, "")]
         if missing:
-            raise ValueError(f"❌ متغيرات مفقودة: {', '.join(missing)}")
-
+            raise ValueError(f"متغيرات مفقودة: {', '.join(missing)}")
         return True

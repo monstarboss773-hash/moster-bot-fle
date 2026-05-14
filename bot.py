@@ -11,21 +11,29 @@ class MonsterBot(Client):
         self.config.validate()
 
         try:
-    super().__init__(
-        session_cookies=cookies,
-        user_agent="Mozilla/5.0"
-    )
-except TypeError:
-    super().__init__(
-        self.config.EMAIL,
-        self.config.PASSWORD,
-        session_cookies=cookies,
-        user_agent="Mozilla/5.0"
-    
+            cookies = json.loads(self.config.COOKIES)
+        except json.JSONDecodeError:
+            cookies = self.config.COOKIES
+
+        logger.info(
+            "ENV loaded: email_set=%s password_len=%s cookies_len=%s",
+            bool(self.config.EMAIL),
+            len(self.config.PASSWORD or ""),
+            len(self.config.COOKIES or "")
         )
 
-        logger.info("ENV loaded: email_set=%s password_len=%s", bool(self.config.EMAIL), len(self.config.PASSWORD or ""))
-
+        try:
+            super().__init__(
+                session_cookies=cookies,
+                user_agent="Mozilla/5.0"
+            )
+        except TypeError:
+            super().__init__(
+                self.config.EMAIL,
+                self.config.PASSWORD,
+                session_cookies=cookies,
+                user_agent="Mozilla/5.0"
+            )
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         try:
